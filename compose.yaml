@@ -1,0 +1,47 @@
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
+    # volumes:
+    #   - ./frontend/src:/app/src
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore: 
+            - node_modules/
+        - action: rebuild
+          path: ./frontend/package.json
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/mydb
+    depends_on:
+      - db
+    volumes:
+      - ./backend/src:/usr/src/app/src
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
