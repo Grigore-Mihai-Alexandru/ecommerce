@@ -17,6 +17,7 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @Get('me')
     async getUserInfo(@Request() req) {
+        console.log(req.user);
         return req.user; // Return the user information from the request object
     }
 
