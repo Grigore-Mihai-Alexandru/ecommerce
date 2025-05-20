@@ -16,6 +16,7 @@ describe('AuthService', () => {
     email: 'test@example.com',
     name: 'Test User',
     password: bcrypt.hashSync('password123', 10),
+    createdAt: new Date()
   };
 
   beforeEach(async () => {

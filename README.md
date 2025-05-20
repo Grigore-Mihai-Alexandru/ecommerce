@@ -18,7 +18,7 @@ Ecommerce este o aplicație full-stack care permite utilizatorilor să posteze, 
 ## Instalare și rulare
 1. Clonarea repository-ului:
    ```sh
-   git clone https://github.com/utilizator/ecommerce.git
+   git clone https://github.com/Grigore-Mihai-Alexandru/ecommerce.git
    cd ecommerce
 
 2. Pornirea aplicației în Docker:

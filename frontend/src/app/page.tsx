@@ -9,7 +9,8 @@ export default function Home() {
     fetch("http://localhost:5000")
       .then((response) => response.json())
       .then((data) => {
-        setMesaj(data.mesaj);
+        console.log(data)
+        setMesaj(data);
       })
       .catch((error) => console.error("Error fetching mesaj:", error));
   }, []);
