@@ -143,35 +143,6 @@ export class UploadService {
   }
 
 
-  // async deleteImage(publicId: string, userId: SignInDataDto): Promise<boolean> {
-    
-  //   const user= await this.prisma.user.findUnique({
-  //     where: {
-  //       email: userId.email,
-  //     },
-  //   });
-
-  //   if (!user) {
-  //     throw new Error('User not found');
-  //   }
-
-
-  //   try {
-  //     await this.cloudinary.uploader.destroy(publicId);
-
-  //     await this.prisma.image.deleteMany({
-  //       where: {
-  //         publicId,
-  //         userId: user.id,
-  //       },
-  //     });
-
-  //     return true;
-  //   } catch (error) {
-  //     throw new Error('Image deletion failed: ' + error);
-  //   }
-  // }
-
   async updateProfilePicture(user: SignInDataDto, file: Express.Multer.File): Promise<UploadApiResponse> {
     
     const userIdFromToken = await this.prisma.user.findUnique({
@@ -181,7 +152,7 @@ export class UploadService {
     });
     
     if (!userIdFromToken) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const existingImage = await this.prisma.image.findUnique({

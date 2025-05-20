@@ -21,21 +21,37 @@ model User {
 }
 
 model Post {
-  id          Int       @id @default(autoincrement())
-  title       String
-  content     String?
-  published   Boolean   @default(false)
-  author      User?     @relation(fields: [authorId], references: [id])
-  authorId    Int?
-  category    String?
-  subcategory String?
-  tags        String[] // Array of strings for tags
-  comments    Comment[]
-  likes       Int       @default(0)
-  likedBy     User[]    @relation("LikedPosts")
-  images      Image[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int          @id @default(autoincrement())
+  title         String
+  content       String?
+  published     Boolean      @default(true)
+  author        User?        @relation(fields: [authorId], references: [id])
+  authorId      Int?
+  category      Category?    @relation(fields: [categoryId], references: [id])
+  categoryId    Int?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategoryId Int?
+  tags          String[]
+  comments      Comment[]
+  likedBy       User[]       @relation("LikedPosts")
+  images        Image[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Category {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  subcategories Subcategory[]
+  posts         Post[]
+}
+
+model Subcategory {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  posts      Post[]
 }
 
 model Comment {
