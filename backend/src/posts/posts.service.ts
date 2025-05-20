@@ -4,12 +4,13 @@ import { Post, Prisma } from '@prisma/client';
 import { UploadApiResponse } from 'cloudinary';
 import { Readable } from 'stream';
 import { SignInDataDto } from 'src/auth/dto/sign-in-data.dto';
+import { connect } from 'http2';
 
-type FormDataPostInput = {
-  [key: string]: any; // raw input from form-data (everything is string)
-};
+// type FormDataPostInput = {
+//   [key: string]: any; // raw input from form-data (everything is string)
+// };
 
-type Mode = 'create' | 'update';
+// type Mode = 'create' | 'update';
 
 @Injectable()
 export class PostsService {
@@ -59,11 +60,11 @@ export class PostsService {
   }
 
 
-  // posts/category/:category
-  async findByCategory(category: string) {
+  //posts/category/:category
+  async findByCategory(categoryId: string) {
     return this.prisma.post.findMany({
       where: {
-        category: category,
+        categoryId: Number(categoryId),
         published: true,
       },
       include: {
@@ -78,14 +79,14 @@ export class PostsService {
   }
 
   // posts/category/:category/subcategory/:subcategory
-  async findByFilters(category?: string, subcategory?: string, tag?: string) {
+  async findByFilters(categoryId?: string, subcategoryId?: string, tag?: string) {
     return this.prisma.post.findMany({
       where: {
         AND: [
-          category ? { category } : {},
-          subcategory ? { subcategory } : {},
-          tag ? { tags: { has: tag } } : {},
-        ],
+        categoryId ? { categoryId: Number(categoryId) } : {},
+        subcategoryId ? { subcategoryId: Number(subcategoryId) } : {},
+        tag ? { tags: { has: tag } } : {},
+      ],
         published: true,
       },
     });
@@ -234,8 +235,7 @@ export class PostsService {
       author: {
         connect: { id: Number(input.authorId) }
       },
-      tags: [],
-      likes: 0
+      tags: []
     };
 
     if (input.content) result.content = input.content;
@@ -246,24 +246,28 @@ export class PostsService {
         result.published = !!input.published;
       }
     }
-    if (input.category) result.category = input.category;
-    if (input.subcategory) result.subcategory = input.subcategory;
-
-    if (input.likes !== undefined) {
-      const likes = Number(input.likes);
-      if (!isNaN(likes)) result.likes = likes;
+    if (input.categoryId) {
+        result.category = {
+        connect: { id: Number(input.categoryId) }
+      };
+    }
+    if (input.subcategoryId) {
+      result.subcategory = {
+        connect: { id: Number(input.subcategoryId) }
+      };
     }
 
+
     if (input.tags !== undefined) {
-        if (Array.isArray(input.tags)) {
-          result.tags = input.tags;
-        } else if (typeof input.tags === 'string') {
-          result.tags = (input.tags as string)
-            .split(',')
-            .map(tag => tag.trim())
-            .filter(Boolean);
-        }
+      if (Array.isArray(input.tags)) {
+        result.tags = input.tags;
+      } else if (typeof input.tags === 'string') {
+        result.tags = (input.tags as string)
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean);
       }
+    }
 
     return result;
   }
@@ -281,8 +285,18 @@ export class PostsService {
         result.published = !!input.published;
       }
     }
-    if (input.category) result.category = input.category;
-    if (input.subcategory) result.subcategory = input.subcategory;
+
+    if (input.categoryId) {
+      result.category = {
+        connect: { id: Number(input.categoryId) }
+      };
+    }
+    if (input.subcategoryId) {
+      result.subcategory = {
+        connect: { id: Number(input.subcategoryId) }
+      };
+    }
+
 
     if (input.authorId !== undefined) {
       const authorId = Number(input.authorId);
@@ -291,20 +305,15 @@ export class PostsService {
       }
     }
 
-    if (input.likes !== undefined) {
-      const likes = Number(input.likes);
-      if (!isNaN(likes)) result.likes = likes;
-    }
-
     if (input.tags !== undefined) {
-        if (Array.isArray(input.tags)) {
-          result.tags = input.tags;
-        } else if (typeof input.tags === 'string') {
-          result.tags = (input.tags as string)
-            .split(',')
-            .map(tag => tag.trim())
-            .filter(Boolean);
-        }
+      if (Array.isArray(input.tags)) {
+        result.tags = input.tags;
+      } else if (typeof input.tags === 'string') {
+        result.tags = (input.tags as string)
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean);
+      }
     }
 
     return result;

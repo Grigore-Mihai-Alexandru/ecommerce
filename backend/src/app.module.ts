@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './db/prisma.module';
 import { UploadModule } from './upload/upload.module';
 import { PostsModule } from './posts/posts.module';
+import { CategoryModule } from './category/category.module';
+import { SubcategoryModule } from './subcategory/subcategory.module';
 
 @Module({
   imports: [
@@ -15,7 +17,9 @@ import { PostsModule } from './posts/posts.module';
     AuthModule,
     PrismaModule,
     UploadModule,
-    PostsModule
+    PostsModule,
+    CategoryModule,
+    SubcategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
