@@ -27,16 +27,16 @@ export class AuthService {
     async validateUser(input: AuthInputDto): Promise<Partial<User> | null> {
         const user = await this.usersService.finduserByEmail(input.email);
         if (user && user.password && await bcrypt.compare(input.password, user.password) ) {
-            const { password, id, createdAt , ...result } = user;
+            const { password, name, createdAt , ...result } = user;
             return result;
         }
         return null;
     }
 
     async signIn(user: Partial<User>): Promise<AuthResultDto> {
-        const payload = { email: user.email, sub: user.name };
+        const payload = { email: user.email, sub: user.id, role: user.role };
         const accessToken = await this.jwtService.signAsync(payload);
-
+        
         // Assuming AuthResultDto has accessToken and user fields, otherwise spread user fields as needed
         return { accessToken, ...user };
     }

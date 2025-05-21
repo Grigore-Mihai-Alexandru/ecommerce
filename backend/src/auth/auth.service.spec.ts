@@ -16,14 +16,20 @@ describe('AuthService', () => {
     email: 'test@example.com',
     name: 'Test User',
     password: bcrypt.hashSync('password123', 10),
-    createdAt: new Date()
+    createdAt: new Date(),
+    role: 'USER' as any,
   };
 
   beforeEach(async () => {
     usersService = {
       finduserByEmail: jest.fn().mockResolvedValue(mockUser),
       user: jest.fn().mockResolvedValue(null),
-      createUser: jest.fn().mockImplementation((data) => ({ id: 2, ...data })),
+      createUser: jest.fn().mockImplementation((data) => ({
+        id: 2,
+        role: 'USER',
+        createdAt: new Date(),
+        ...data,
+      })),
       getAllUsers: jest.fn().mockResolvedValue([mockUser]),
     };
 
@@ -43,28 +49,36 @@ describe('AuthService', () => {
   });
 
   describe('validateUser', () => {
-    it('should return partial user data (name and email) without password if password matches and id', async () => {
+    it('should return partial user data (id, name, email, role) if password matches', async () => {
       const result = await authService.validateUser({
         email: mockUser.email,
         password: 'password123',
       });
-      expect(result).toEqual({ name: mockUser.name, email: mockUser.email });
+
+      expect(result).toEqual({
+        id: mockUser.id,
+        email: mockUser.email,
+        role: mockUser.role,
+      });
     });
 
     it('should return null if user is not found', async () => {
       (usersService.finduserByEmail as jest.Mock).mockResolvedValue(null);
+
       const result = await authService.validateUser({
-        email: 'wrong@example.com',
+        email: 'notfound@example.com',
         password: 'password123',
       });
+
       expect(result).toBeNull();
     });
 
-    it('should return null if password is incorrect', async () => {
+    it('should return null if password does not match', async () => {
       const result = await authService.validateUser({
         email: mockUser.email,
-        password: 'wrongpass',
+        password: 'wrongpassword',
       });
+
       expect(result).toBeNull();
     });
   });
@@ -77,18 +91,20 @@ describe('AuthService', () => {
       });
 
       expect(result).toEqual({
-        name: mockUser.name,
+        id: mockUser.id,
         email: mockUser.email,
+        role: mockUser.role,
         accessToken: 'mockAccessToken',
       });
     });
 
     it('should throw UnauthorizedException on failure', async () => {
       jest.spyOn(authService, 'validateUser').mockResolvedValue(null);
+
       await expect(
         authService.authenticate({
-          email: 'test@example.com',
-          password: 'wrong',
+          email: mockUser.email,
+          password: 'invalid',
         }),
       ).rejects.toThrow(UnauthorizedException);
     });
@@ -96,18 +112,28 @@ describe('AuthService', () => {
 
   describe('signIn', () => {
     it('should return signed JWT and user data', async () => {
-      const user = { name: 'Test User', email: 'test@example.com' };
+      const user = {
+        id: mockUser.id,
+        name: mockUser.name,
+        email: mockUser.email,
+        role: mockUser.role,
+      };
+
       const result = await authService.signIn(user);
-      expect(result).toEqual({ accessToken: 'mockAccessToken', ...user });
+
+      expect(result).toEqual({
+        accessToken: 'mockAccessToken',
+        ...user,
+      });
     });
   });
 
   describe('register', () => {
-    it('should create a user if not existing', async () => {
+    it('should create a new user if not existing', async () => {
       const newUser = {
         email: 'new@example.com',
-        name: 'New',
-        password: 'pass',
+        name: 'New User',
+        password: 'pass123',
       };
 
       (usersService.user as jest.Mock).mockResolvedValue(null);
@@ -118,12 +144,16 @@ describe('AuthService', () => {
         email: newUser.email,
         name: newUser.name,
       });
+
       expect(result.password).not.toBe(newUser.password); // should be hashed
     });
 
     it('should throw if user already exists', async () => {
       (usersService.user as jest.Mock).mockResolvedValue(mockUser);
-      await expect(authService.register(mockUser)).rejects.toThrow(UnauthorizedException);
+
+      await expect(authService.register(mockUser)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -134,3 +164,4 @@ describe('AuthService', () => {
     });
   });
 });
+// 

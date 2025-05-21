@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role} from '@prisma/client';
+import { Roles } from 'src/auth/guards/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AuthGuard } from 'src/auth/guards/auth-guard';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post('create') 
+  @Post('create')
+  @UseGuards(AuthGuard, RolesGuard) // Use the RolesGuard to protect this route
+  @Roles(Role.ADMIN) // Only admin can create a category
   create(@Body() createCategoryDto: Prisma.CategoryCreateInput) {
     return this.categoryService.create(createCategoryDto);
   }
@@ -22,6 +27,8 @@ export class CategoryController {
   }
 
   @Patch('update/:id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: Prisma.CategoryUpdateInput,
@@ -30,6 +37,8 @@ export class CategoryController {
   }
 
   @Delete('remove/:id')
+  @UseGuards(RolesGuard) 
+  @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.remove(id);
   }

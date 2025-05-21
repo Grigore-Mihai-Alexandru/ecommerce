@@ -26,6 +26,7 @@ export class UsersService {
                 email: true,
                 name: true,
                 password: true,
+                role: true,
             },
             where: { email: email },
         });

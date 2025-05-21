@@ -18,6 +18,7 @@ model User {
   ratings    Rating[]
   image      Image? // One-to-one: profile picture
   createdAt  DateTime  @default(now())
+  role       Role      @default(USER) // USER, ADMIN
 }
 
 model Post {
@@ -35,6 +36,7 @@ model Post {
   comments      Comment[]
   likedBy       User[]       @relation("LikedPosts")
   images        Image[]
+  price         Int?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -86,4 +88,9 @@ model Image {
   postId    Int?
   user      User?    @relation(fields: [userId], references: [id])
   userId    Int?     @unique // 1 to 1 relationship with User
+}
+
+enum Role {
+  USER
+  ADMIN
 }
