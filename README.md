@@ -24,5 +24,11 @@ Ecommerce este o aplicație full-stack care permite utilizatorilor să posteze, 
 2. Pornirea aplicației în Docker:
     docker-compose up --build
 
-3. Accesarea aplicației la http://localhost:3000
+3. Deschiderea unui nou terminal si rularea comenzilor pentru a genera baza de date
+    ```sh
+    cd backend
+    npx prisma format
+    npx prisma migrate dev --name init
+
+4. Accesarea aplicației la http://localhost:3000
 

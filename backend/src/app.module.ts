@@ -9,6 +9,7 @@ import { UploadModule } from './upload/upload.module';
 import { PostsModule } from './posts/posts.module';
 import { CategoryModule } from './category/category.module';
 import { SubcategoryModule } from './subcategory/subcategory.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { SubcategoryModule } from './subcategory/subcategory.module';
     UploadModule,
     PostsModule,
     CategoryModule,
-    SubcategoryModule
+    SubcategoryModule,
+    CommentModule
   ],
   controllers: [AppController],
   providers: [AppService],
