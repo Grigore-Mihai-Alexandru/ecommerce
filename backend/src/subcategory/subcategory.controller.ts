@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { SubcategoryService } from './subcategory.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/guards/roles.decorator';
 
 @Controller('subcategory')
 export class SubcategoryController {
   constructor(private readonly subcategoryService: SubcategoryService) {}
 
   @Post('create')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   create(@Body() data: Prisma.SubcategoryCreateInput) {
     return this.subcategoryService.create(data);
   }
@@ -22,6 +26,8 @@ export class SubcategoryController {
   }
 
   @Patch('update/:id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: Prisma.SubcategoryUpdateInput,
@@ -30,6 +36,8 @@ export class SubcategoryController {
   }
 
   @Delete('remove/:id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.subcategoryService.remove(id);
   }

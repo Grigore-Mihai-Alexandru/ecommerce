@@ -18,6 +18,7 @@ model User {
   ratings    Rating[]
   image      Image? // One-to-one: profile picture
   createdAt  DateTime  @default(now())
+  role       Role      @default(USER) // USER, ADMIN
 }
 
 model Post {
@@ -35,6 +36,7 @@ model Post {
   comments      Comment[]
   likedBy       User[]       @relation("LikedPosts")
   images        Image[]
+  price         Int?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -55,14 +57,17 @@ model Subcategory {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   content   String
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User      @relation(fields: [authorId], references: [id])
   authorId  Int
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post      @relation(fields: [postId], references: [id])
   postId    Int
-  createdAt DateTime @default(now())
-  editedAt  DateTime @updatedAt
+  parentId  Int? // For nested comments
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  children  Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
+  editedAt  DateTime  @updatedAt
 }
 
 model Rating {
@@ -83,4 +88,9 @@ model Image {
   postId    Int?
   user      User?    @relation(fields: [userId], references: [id])
   userId    Int?     @unique // 1 to 1 relationship with User
+}
+
+enum Role {
+  USER
+  ADMIN
 }

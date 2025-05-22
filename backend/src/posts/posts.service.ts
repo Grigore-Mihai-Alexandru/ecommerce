@@ -39,7 +39,6 @@ export class PostsService {
     return this.prisma.post.findMany({
       where: {
         authorId: userId,
-        published: true,
       }
     });
   }
